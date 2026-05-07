@@ -1,0 +1,7 @@
+server:
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+  config:
+    url: ""
