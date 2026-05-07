@@ -47,7 +47,7 @@ variable "node_groups" {
   default = {
     eks_node_gitops = {
       name           = "eks_node_gitops"
-      instance_types = ["t3.medium"]
+      instance_types = ["t3.micro"]
       min_size       = 1
       max_size       = 3
       desired_size   = 2
