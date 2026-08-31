@@ -1,0 +1,26 @@
+name: serverops-tests
+
+on:
+  push:
+    branches: ["serverops-toolkit-v0.1"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.10", "3.12"]
+    defaults:
+      run:
+        working-directory: serverops-toolkit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile
+        run: python -m compileall -q serverops serverops.py tests
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
