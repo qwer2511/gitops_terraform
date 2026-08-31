@@ -6,3 +6,5 @@ serverops.json
 serverops_report_*.txt
 serverops_report_*.json
 *.log
+servers.json
+.serverops/

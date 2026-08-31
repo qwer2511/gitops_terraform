@@ -1,0 +1,7 @@
+{
+  "servers": [
+    {"name":"내 로컬 서버","host":"127.0.0.1","group":"개발","local":true,"notes":"ServerOps가 실행 중인 현재 서버"},
+    {"name":"WEB01","host":"10.0.0.11","port":22,"user":"serverops","group":"운영 WEB","key_file":"~/.ssh/id_ed25519","local":false,"services":["sshd","httpd"],"notes":"예시 서버 - 실제 환경에 맞게 변경"},
+    {"name":"DB01","host":"10.0.0.21","port":22,"user":"serverops","group":"운영 DB","key_file":"~/.ssh/id_ed25519","local":false,"services":["sshd","mariadb"],"notes":"예시 서버 - 실제 환경에 맞게 변경"}
+  ]
+}

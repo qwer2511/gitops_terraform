@@ -34,17 +34,24 @@ def run_command(command: Iterable[str], timeout: int = 8) -> Tuple[int, str, str
     args = list(command)
     start = time.monotonic()
     try:
-        proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=timeout, check=False)
+        proc = subprocess.run(
+            args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
         elapsed = int((time.monotonic() - start) * 1000)
         return proc.returncode, proc.stdout.strip(), proc.stderr.strip(), elapsed
     except FileNotFoundError:
         elapsed = int((time.monotonic() - start) * 1000)
-        return 127, "", f"command not found: {args[0]}", elapsed
+        return 127, "", f"명령어를 찾을 수 없음: {args[0]}", elapsed
     except subprocess.TimeoutExpired as exc:
         elapsed = int((time.monotonic() - start) * 1000)
         stdout = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
         stderr = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
-        return 124, stdout.strip(), (stderr.strip() or f"timeout after {timeout}s"), elapsed
+        return 124, stdout.strip(), (stderr.strip() or f"{timeout}초 후 시간 초과"), elapsed
 
 
 def command_text(command: Iterable[str]) -> str:

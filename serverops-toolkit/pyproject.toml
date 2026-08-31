@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "serverops-toolkit"
+version = "0.2.0"
+description = "Linux server operations and troubleshooting toolkit with Korean CLI/GUI"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "qwer2511"}]
+keywords = ["linux", "sysadmin", "devops", "mariadb", "monitoring", "troubleshooting"]
+
+[project.scripts]
+serverops = "serverops.cli:main"
+serverops-gui = "serverops.gui:launch"
