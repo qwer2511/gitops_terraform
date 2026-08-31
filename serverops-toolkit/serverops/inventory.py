@@ -18,6 +18,8 @@ class ServerEntry:
     local: bool = False
     services: List[str] = field(default_factory=list)
     notes: str = ""
+    jump_host: str = ""
+    host_key_policy: str = "strict"
 
     @property
     def display_target(self) -> str:
@@ -58,17 +60,10 @@ def load_inventory(path: Optional[str] = None) -> List[ServerEntry]:
         port = int(row.get("port", 22))
         if port < 1 or port > 65535:
             raise ValueError(f"{name}: SSH 포트 범위가 올바르지 않습니다.")
-        entries.append(ServerEntry(
-            name=name,
-            host=str(row.get("host", "127.0.0.1")).strip() or "127.0.0.1",
-            port=port,
-            user=str(row.get("user", "")).strip(),
-            group=str(row.get("group", "기본")).strip() or "기본",
-            key_file=os.path.expanduser(str(row.get("key_file", "")).strip()),
-            local=bool(row.get("local", False)),
-            services=[str(x).strip() for x in row.get("services", []) if str(x).strip()],
-            notes=str(row.get("notes", "")),
-        ))
+        policy = str(row.get("host_key_policy", "strict")).strip().lower() or "strict"
+        if policy not in {"strict", "accept-new"}:
+            raise ValueError(f"{name}: host_key_policy는 strict 또는 accept-new만 사용할 수 있습니다.")
+        entries.append(ServerEntry(name=name, host=str(row.get("host", "127.0.0.1")).strip() or "127.0.0.1", port=port, user=str(row.get("user", "")).strip(), group=str(row.get("group", "기본")).strip() or "기본", key_file=os.path.expanduser(str(row.get("key_file", "")).strip()), local=bool(row.get("local", False)), services=[str(x).strip() for x in row.get("services", []) if str(x).strip()], notes=str(row.get("notes", "")), jump_host=str(row.get("jump_host", "")).strip(), host_key_policy=policy))
     return entries or _default_entries()
 
 

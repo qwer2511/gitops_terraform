@@ -1,22 +1,15 @@
 # Changelog
 
-## 0.2.0
+## 0.3.0 - 2026-08-31
 
-- 한국어 데스크톱 GUI 추가
-- 기본 다크 모드 및 라이트 모드 전환 추가
-- 서버 그룹/인벤토리 구조 추가
-- 서버 검색 및 선택 UI 추가
-- 시스템/네트워크/서비스/MariaDB/포트/로그/IP 검색 빠른 작업 추가
-- 진단 결과 테이블, 상세 로그 뷰, 상태 요약 카드 추가
-- GUI에서 TXT 진단 리포트 저장 기능 추가
-- `serverops gui` / `serverops-gui` 실행 진입점 추가
-- `servers.json`을 Git 제외 대상으로 추가
-
-## 0.1.1
-
-- CLI/리포트 한국어화
-- 점검 상태와 카테고리 한국어 라벨 추가
-
-## 0.1.0
-
-- 초기 Linux 서버 진단 CLI
+- SSH Key 기반 원격 서버 진단 추가
+- RHEL/Rocky/Alma/CentOS, Ubuntu/Debian 계열 자동 탐지 및 명령 fallback 레이어 추가
+- `sshd/ssh`, `httpd/apache2`, `crond/cron` 서비스 별칭 처리
+- `ip/ifconfig`, `ss/netstat` 대체 명령 지원
+- OS/서비스 관리자/패키지 관리자/방화벽 도구 호환성 점검 추가
+- OpenSSH SFTP 업로드/다운로드 GUI 추가
+- SSH 전송 압축(`-C`), 폴더 ZIP 묶기, SHA-256 전송 후 무결성 검증 추가
+- SSH Jump Host(`-J`) 및 host key 정책(`strict`, `accept-new`) 지원
+- 원격 진단 감사 로그(`~/.serverops/audit.jsonl`) 추가
+- 원격 IP/문자열 검색 추가
+- 테스트 13개로 확장

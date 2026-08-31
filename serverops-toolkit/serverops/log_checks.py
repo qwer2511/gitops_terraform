@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 
+from .os_compat import default_log_candidates, detect_local_profile
 from .common import CheckResult, OK, WARN, INFO
 
 PATTERN = re.compile(r"\b(error|fail(?:ed|ure)?|critical|fatal|panic|segfault|oom)\b", re.IGNORECASE)
@@ -22,4 +23,7 @@ def scan_file(path: str, tail_lines: int = 1000, max_matches: int = 30) -> Check
 
 
 def run_log_checks(config: dict) -> list[CheckResult]:
-    return [scan_file(str(path)) for path in config.get("log_files", [])]
+    configured = [str(path) for path in config.get("log_files", [])]
+    detected = default_log_candidates(detect_local_profile())
+    paths = list(dict.fromkeys(configured + detected))
+    return [scan_file(path) for path in paths]

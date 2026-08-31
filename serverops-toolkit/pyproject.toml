@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "serverops-toolkit"
-version = "0.2.0"
-description = "Linux server operations and troubleshooting toolkit with Korean CLI/GUI"
+version = "0.3.0"
+description = "Linux server operations and troubleshooting toolkit with Korean CLI/GUI, SSH and SFTP"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
