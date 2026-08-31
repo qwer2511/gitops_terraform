@@ -2,7 +2,7 @@ name: ServerOps tests
 
 on:
   push:
-    branches: ["serverops-toolkit-v0.2"]
+    branches: ["serverops-toolkit-v0.*"]
   pull_request:
   workflow_dispatch:
 
