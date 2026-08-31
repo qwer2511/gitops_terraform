@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+serverops.json
+serverops_report_*.txt
+serverops_report_*.json
+*.log
