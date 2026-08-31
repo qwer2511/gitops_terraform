@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import time
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 from .inventory import ServerEntry
 
@@ -33,8 +33,11 @@ def sftp_available() -> bool:
 
 
 def _policy(server: ServerEntry) -> str:
+    """Map our friendly policy names to OpenSSH StrictHostKeyChecking values."""
     value = (server.host_key_policy or "strict").lower()
-    return value if value in {"strict", "accept-new"} else "strict"
+    if value == "accept-new":
+        return "accept-new"
+    return "yes"
 
 
 def ssh_options(server: ServerEntry, connect_timeout: int = 7) -> List[str]:
