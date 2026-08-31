@@ -1,0 +1,16 @@
+{
+  "disk_paths": ["/", "/var", "/home"],
+  "ping_targets": ["127.0.0.1", "8.8.8.8"],
+  "dns_target": "example.com",
+  "services": ["sshd", "mariadb", "httpd"],
+  "ports": [
+    {"host": "127.0.0.1", "port": 22},
+    {"host": "127.0.0.1", "port": 3306},
+    {"host": "127.0.0.1", "port": 80}
+  ],
+  "ip_scan_roots": ["/etc", "/opt"],
+  "ip_scan_excludes": ["/etc/ssl", "/etc/pki"],
+  "ip_scan_max_file_bytes": 2000000,
+  "log_files": ["/var/log/messages", "/var/log/mariadb/mariadb.log", "/var/log/httpd/error_log"],
+  "mariadb": {"admin_ping": true, "host": "127.0.0.1", "user": "root"}
+}
