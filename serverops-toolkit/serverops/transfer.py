@@ -29,6 +29,22 @@ class TransferResult:
     duration_ms: int = 0
 
 
+def _audit_transfer(action: str, server: ServerEntry, result: TransferResult) -> TransferResult:
+    write_audit(
+        f"sftp:{action}",
+        server.display_target,
+        result.ok,
+        details={
+            "remote_path": result.remote_path,
+            "bytes": result.bytes_transferred,
+            "verified": result.verified,
+            "duration_ms": result.duration_ms,
+            "message": result.message,
+        },
+    )
+    return result
+
+
 def sha256_file(path: str) -> str:
     digest = hashlib.sha256()
     with open(path, "rb") as fh:
@@ -39,6 +55,11 @@ def sha256_file(path: str) -> str:
 
 def _sftp_quote(value: str) -> str:
     return '"' + value.replace('"', '\\"') + '"'
+
+
+def _local_sftp_path(value: str) -> str:
+    """OpenSSH sftp batch files are more reliable with forward slashes on Windows."""
+    return os.path.abspath(value).replace("\\", "/")
 
 
 def _run_sftp(server: ServerEntry, batch_line: str, timeout: int, compression: bool) -> Tuple[int, str, str, int]:
@@ -91,22 +112,22 @@ def upload(server: ServerEntry, local_path: str, remote_path: str, *, archive: b
             elif archive and not remote_path.lower().endswith(".zip"):
                 remote_path += ".zip"
         if not os.path.isfile(send_path):
-            return TransferResult(False, "업로드할 파일을 찾을 수 없습니다.", original, remote_path)
+            return _audit_transfer("upload", server, TransferResult(False, "업로드할 파일을 찾을 수 없습니다.", original, remote_path))
         local_hash = sha256_file(send_path) if verify else ""
-        line = f"put {_sftp_quote(os.path.abspath(send_path))} {_sftp_quote(remote_path)}"
+        line = f"put {_sftp_quote(_local_sftp_path(send_path))} {_sftp_quote(remote_path)}"
         rc, out, err, ms = _run_sftp(server, line, timeout, ssh_compression)
         if rc != 0:
-            return TransferResult(False, err or out or "SFTP 업로드 실패", original, remote_path, duration_ms=ms)
+            return _audit_transfer("upload", server, TransferResult(False, err or out or "SFTP 업로드 실패", original, remote_path, duration_ms=ms))
         remote_hash = ""
         verified = False
         if verify:
             remote_hash, _ = remote_sha256(server, remote_path)
             verified = bool(remote_hash and remote_hash == local_hash)
             if not remote_hash:
-                return TransferResult(True, "업로드 성공. 원격 SHA-256 도구가 없어 무결성 검증은 생략됨.", original, remote_path, os.path.getsize(send_path), local_hash, "", False, ms)
+                return _audit_transfer("upload", server, TransferResult(True, "업로드 성공. 원격 SHA-256 도구가 없어 무결성 검증은 생략됨.", original, remote_path, os.path.getsize(send_path), local_hash, "", False, ms))
             if not verified:
-                return TransferResult(False, "업로드는 완료됐지만 SHA-256 값이 일치하지 않습니다.", original, remote_path, os.path.getsize(send_path), local_hash, remote_hash, False, ms)
-        return TransferResult(True, "업로드 및 SHA-256 검증 완료" if verify else "업로드 완료", original, remote_path, os.path.getsize(send_path), local_hash, remote_hash, verified, ms)
+                return _audit_transfer("upload", server, TransferResult(False, "업로드는 완료됐지만 SHA-256 값이 일치하지 않습니다.", original, remote_path, os.path.getsize(send_path), local_hash, remote_hash, False, ms))
+        return _audit_transfer("upload", server, TransferResult(True, "업로드 및 SHA-256 검증 완료" if verify else "업로드 완료", original, remote_path, os.path.getsize(send_path), local_hash, remote_hash, verified, ms))
     finally:
         if temp_archive:
             try:
@@ -121,15 +142,15 @@ def download(server: ServerEntry, remote_path: str, local_path: str, *, ssh_comp
     remote_hash = ""
     if verify:
         remote_hash, _ = remote_sha256(server, remote_path)
-    line = f"get {_sftp_quote(remote_path)} {_sftp_quote(os.path.abspath(local_path))}"
+    line = f"get {_sftp_quote(remote_path)} {_sftp_quote(_local_sftp_path(local_path))}"
     rc, out, err, ms = _run_sftp(server, line, timeout, ssh_compression)
     if rc != 0:
-        return TransferResult(False, err or out or "SFTP 다운로드 실패", local_path, remote_path, duration_ms=ms)
+        return _audit_transfer("download", server, TransferResult(False, err or out or "SFTP 다운로드 실패", local_path, remote_path, duration_ms=ms))
     if not os.path.isfile(local_path):
-        return TransferResult(False, "다운로드 결과 파일을 찾을 수 없습니다.", local_path, remote_path, duration_ms=ms)
+        return _audit_transfer("download", server, TransferResult(False, "다운로드 결과 파일을 찾을 수 없습니다.", local_path, remote_path, duration_ms=ms))
     local_hash = sha256_file(local_path) if verify else ""
     verified = bool(verify and remote_hash and local_hash == remote_hash)
     if verify and remote_hash and not verified:
-        return TransferResult(False, "다운로드는 완료됐지만 SHA-256 값이 일치하지 않습니다.", local_path, remote_path, os.path.getsize(local_path), local_hash, remote_hash, False, ms)
+        return _audit_transfer("download", server, TransferResult(False, "다운로드는 완료됐지만 SHA-256 값이 일치하지 않습니다.", local_path, remote_path, os.path.getsize(local_path), local_hash, remote_hash, False, ms))
     message = "다운로드 및 SHA-256 검증 완료" if verified else "다운로드 완료" if not verify else "다운로드 성공. 원격 SHA-256 도구가 없어 무결성 검증은 생략됨."
-    return TransferResult(True, message, local_path, remote_path, os.path.getsize(local_path), local_hash, remote_hash, verified, ms)
+    return _audit_transfer("download", server, TransferResult(True, message, local_path, remote_path, os.path.getsize(local_path), local_hash, remote_hash, verified, ms))
