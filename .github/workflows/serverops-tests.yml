@@ -1,8 +1,8 @@
-name: serverops-tests
+name: ServerOps tests
 
 on:
   push:
-    branches: ["serverops-toolkit-v0.1"]
+    branches: ["serverops-toolkit-v0.2"]
   pull_request:
   workflow_dispatch:
 
@@ -21,6 +21,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Compile
-        run: python -m compileall -q serverops serverops.py tests
+        run: python -m compileall -q serverops serverops.py serverops_gui.py tests
       - name: Unit tests
         run: python -m unittest discover -s tests -v
