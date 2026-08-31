@@ -30,6 +30,12 @@ class SSHOptionTests(unittest.TestCase):
         self.assertIn("-J", opts)
         self.assertIn("jump@10.0.0.2", opts)
         self.assertIn("-i", opts)
+        self.assertIn("StrictHostKeyChecking=yes", opts)
+
+    def test_accept_new_policy_mapping(self):
+        server = ServerEntry(name="WEB01", host="10.0.0.10", host_key_policy="accept-new")
+        opts = ssh_options(server)
+        self.assertIn("StrictHostKeyChecking=accept-new", opts)
 
 
 class TransferTests(unittest.TestCase):
