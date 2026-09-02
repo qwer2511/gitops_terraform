@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "serverops-toolkit"
-version = "0.3.0"
-description = "Linux server operations and troubleshooting toolkit with Korean CLI/GUI, SSH and SFTP"
+version = "0.4.0"
+description = "Linux server operations toolkit with Korean GUI/CLI, SSH/SFTP and safe TLS certificate replacement"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [{name = "qwer2511"}]
-keywords = ["linux", "sysadmin", "devops", "mariadb", "monitoring", "troubleshooting"]
+keywords = ["linux", "sysadmin", "devops", "mariadb", "monitoring", "troubleshooting", "tls", "certificate"]
 
 [project.scripts]
 serverops = "serverops.cli:main"
